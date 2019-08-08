@@ -35,3 +35,21 @@ body {
     border-collapse: collapse;
     width: 240px;
   }
+  #Travel,#Food {
+    position: absolute;
+    top: 10px;
+    z-index: 5;
+    background-color: #fff;
+    padding: 5px;
+    border: 1px solid #999;
+    text-align: center;
+    font-family: 'Roboto','sans-serif';
+    line-height: 30px;
+    padding-left: 10px;
+  }
+  #Travel{
+    left: 25%;
+  }
+  #Food{
+    left: 75%;
+  }

@@ -10,6 +10,28 @@
 
 <body>
   <input type="text" id="distance" value="500">公尺
+  <div>
+    <strong>Results</strong>
+  </div>
+  <div id="output"></div>
+  <div id="Travel">
+    <b>Mode of Travel: </b>
+    <select id="mode">
+      <option value="DRIVING">Driving</option>
+      <option value="WALKING">Walking</option>
+      <option value="TRANSIT">Transit</option>
+    </select>
+  </div>
+  <div id="Food">
+    <b>Mode of Food: </b>
+    <select id="foodmode">
+      <option value="restaurant">Restaurant</option>
+      <option value="cafe">Cafe</option>
+      <option value="bar">Bar</option>
+      <option value="bakery">Bakery</option>
+    </select>
+  </div>
+
   <div id="map"></div>
   <div id="listing">
     <table id="resultsTable">
@@ -27,6 +49,14 @@
           <td class="iw_attribute_name">Address:</td>
           <td id="iw-address"></td>
         </tr>
+        <tr id="iw-distance-row" class="iw_table_row">
+          <td class="iw_attribute_name">Distance:</td>
+          <td id="iw-distance"></td>
+        </tr>
+        <tr id="iw-opening-row" class="iw_table_row">
+          <td class="iw_attribute_name">營業時間:</td>
+          <td id="iw-opening"></td>
+        </tr>
         <tr id="iw-phone-row" class="iw_table_row">
           <td class="iw_attribute_name">Telephone:</td>
           <td id="iw-phone"></td>
@@ -41,24 +71,58 @@
         </tr>
       </table>
     </div>
+  </div>
+  <script>
+    function moveUp(a, orderId) {
+      var row = a.parentNode.parentNode;
+      var tdSeq = row.rowIndex - 1;
+      if (row.previousSibling) {
+        swapNode(row, row.previousSibling);
+      }
+    }
+    function moveDown(a, orderId) {
+      var row = a.parentNode.parentNode;
+      var tdSeq = row.rowIndex + 1;
+      if (row.nextSibling) {
+        swapNode(row, row.nextSibling);
+      }
+    }
+    function swapNode(node1, node2) {
+      var parent = node1.parentNode;
+      var t1 = node1.nextSibling;
+      var t2 = node2.nextSibling;
+      if (t1) parent.insertBefore(node2, t1);
+      else parent.appendChild(node2);
+      if (t2) parent.insertBefore(node1, t2);
+      else parent.appendChild(node1);
+    }
+  </script>
   <script>
 
-    var map, taipei;
-    var service;
-    var infowindow;
+    var map, taipei, service, infowindow, origin, destination, directionsService, directionsDisplay, geocoder, DistanceMatrix,distanceResponse
     var markers = []
+    var point = []
     var hostnameRegexp = new RegExp('^https?://.+?/');
     var MARKER_PATH = 'https://developers.google.com/maps/documentation/javascript/images/marker_green';
-  
+    var selectedMode = document.getElementById('mode').value;
+    var outputdistance = document.getElementById('output');
+
     function initMap() {
       taipei = new google.maps.LatLng(25.0329694, 121.5654177);
-
+      directionsService = new google.maps.DirectionsService;
       map = new google.maps.Map(document.getElementById('map'), {
         center: taipei,
         zoom: 15
       });
+      // ------------------------------------
 
-      
+      directionsDisplay = new google.maps.DirectionsRenderer;
+      directionsDisplay.setMap(map);
+      document.getElementById('mode').addEventListener('change', function () {
+        calculateAndDisplayRoute(directionsService, directionsDisplay);
+      });
+
+      // ----------------------------------------
       infoWindow = new google.maps.InfoWindow({
         content: document.getElementById('info-content')
       });
@@ -67,44 +131,90 @@
         clearMarkers()
         clearResults()
         map.setZoom(16)
-        addMarker({ coords: event.latLng }, google.maps.Animation.BOUNCE)
-        map.setCenter(event.latLng);
+        origin = event.latLng
+        point.push(new google.maps.Marker({
+          map: map,
+          position: origin,
+          animation: google.maps.Animation.BOUNCE,
+        }))
+        map.setCenter(origin);
         var request = {
-          location: event.latLng,
+          location: origin,
           bounds: map.getBounds(),
           // radius: document.querySelector("#distance").value,
-          type: ['restaurant']
+          type: [document.getElementById('foodmode').value]
         };
         service.nearbySearch(request, search);
 
       })
+      // -------------------------------------------------------------------------------
+      geocoder = new google.maps.Geocoder;
+      DistanceMatrix = new google.maps.DistanceMatrixService;
+      // destination?distance():""
     }
+    function distance() {
+      DistanceMatrix.getDistanceMatrix({
+        origins: [origin],
+        destinations: [destination,{ lat: 25.0421407,lng: 121.5198716},{ lat: 25.0423,lng: 121.52134}],
+        travelMode: selectedMode,
+        unitSystem: google.maps.UnitSystem.METRIC,
+        avoidHighways: false,
+        avoidTolls: false
+      }, function (response, status) {
+        if (status !== 'OK') {
+          alert('Error was: ' + status);
+        } else {
+          distanceResponse=response.rows[0]
+          outputdistance.innerHTML = ""
+          outputdistance.innerHTML += response.rows[0].elements[0].distance.text
+          console.log(response)
+          document.getElementById('iw-distance').textContent = outputdistance.innerHTML;
+        }
+      });
+    }
+    // -------------------------------------------
+    function calculateAndDisplayRoute(directionsService, directionsDisplay) {
+      directionsService.route({
+        origin: origin,
+        destination: destination,
+        travelMode: google.maps.TravelMode[selectedMode]
+      }, function (response, status) {
+        if (status == 'OK') {
+          directionsDisplay.setDirections(response);
+        } else {
+          window.alert('Directions request failed due to ' + status);
+        }
+      });
+    }
+    // -------------------------------------------
     function search(results, status) {
-      console.log(results)
       if (status == google.maps.places.PlacesServiceStatus.OK) {
         for (var i = 0; i < results.length; i++) {
           var markerLetter = String.fromCharCode('A'.charCodeAt(0) + (i % 26));
-            var markerIcon = MARKER_PATH + markerLetter + '.png';
-          addMarker({ coords: results[i].geometry.location }, google.maps.Animation.DROP,markerIcon);
+          var markerIcon = MARKER_PATH + markerLetter + '.png';
+          addMarker({ coords: results[i].geometry.location }, markerIcon);
           markers[i].placeResult = results[i];
-            google.maps.event.addListener(markers[i], 'click', showInfoWindow);
-            setTimeout(dropMarker(i), i * 100);
-            addResult(results[i], i);
+          google.maps.event.addListener(markers[i], 'click', function () { destination = this.position; distance() });
+          google.maps.event.addListener(markers[i], 'click', showInfoWindow);
+          setTimeout(dropMarker(i), i * 100);
+          addResult(results[i], i);
 
         }
       }
     }
-    function addMarker(place, BOUNCE ,markerIcon) {
+    function addMarker(place, markerIcon) {
       markers.push(new google.maps.Marker({
         map: map,
         position: place.coords,
-        animation: BOUNCE,
-        icon:markerIcon
+        animation: google.maps.Animation.DROP,
+        icon: markerIcon
       }))
     }
     function clearMarkers() {
       markers.forEach(e => e.setMap(null))
-      markers=[]
+      markers = []
+      point.forEach(e => e.setMap(null))
+      point = []
     }
 
     function dropMarker(i) {
@@ -144,8 +254,10 @@
       }
     }
 
-// ------------------------------------------------------
+    // ------------------------------------------------------
     function showInfoWindow() {
+
+      calculateAndDisplayRoute(directionsService, directionsDisplay);
       var marker = this;
       service.getDetails({ placeId: marker.placeResult.place_id },
         function (place, status) {
@@ -158,12 +270,26 @@
     }
 
     function buildIWContent(place) {
-      console.log(place)
-      document.getElementById('iw-icon').innerHTML = '<img class="hotelIcon" ' +
+      document.getElementById('iw-icon').innerHTML = '<img' +
         'src="' + place.icon + '"/>';
-      document.getElementById('iw-url').innerHTML = '<b><a href="' + place.url +
+        if(place.website){
+      document.getElementById('iw-url').innerHTML = '<b><a href="' + place.website +
         '">' + place.name + '</a></b>';
+        }else{
+      document.getElementById('iw-url').innerHTML = '<b><a href="' + place.url +
+        '">' + place.name + '</a></b>'
+        }
       document.getElementById('iw-address').textContent = place.vicinity;
+      if (place.opening_hours) {
+        if (place.opening_hours.open_now) {
+          document.getElementById('iw-opening').textContent = "Open Now";
+        } else {
+          document.getElementById('iw-opening').textContent = "Close";
+        }
+      } else {
+        document.getElementById('iw-opening').style.display = "none";
+      }
+
 
       if (place.formatted_phone_number) {
         document.getElementById('iw-phone-row').style.display = '';
@@ -182,7 +308,7 @@
             ratingHtml += '&#10029;';
           }
           document.getElementById('iw-rating-row').style.display = '';
-          document.getElementById('iw-rating').innerHTML = ratingHtml;
+          document.getElementById('iw-rating').innerHTML = ratingHtml + " " + place.rating;
         }
       } else {
         document.getElementById('iw-rating-row').style.display = 'none';
@@ -196,7 +322,7 @@
           fullUrl = website;
         }
         document.getElementById('iw-website-row').style.display = '';
-        document.getElementById('iw-website').textContent = website;
+        document.getElementById('iw-website').innerHTML =  `<a href="${website}">${website}<a>`;;
       } else {
         document.getElementById('iw-website-row').style.display = 'none';
       }

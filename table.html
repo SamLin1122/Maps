@@ -1,0 +1,194 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=GBK">
+<title></title>
+
+<script type="text/javascript"> 
+//使表格行上移，接收引數為連結物件
+function moveUp(_a,orderId){ 
+//通過連結物件獲取表格行的引用
+var _row=_a.parentNode.parentNode;
+//var curRow = null;
+var tdSeq = _row.rowIndex - 1;
+//如果不是第一行，則與上一行交換順序
+if(_row.previousSibling){
+
+swapNode(_row,_row.previousSibling);
+}
+}
+//使表格行下移，接收引數為連結物件
+function moveDown(_a,orderId){
+//通過連結物件獲取表格行的引用
+var _row=_a.parentNode.parentNode;
+var tdSeq = _row.rowIndex + 1;
+//如果不是最後一行，則與下一行交換順序
+if(_row.nextSibling){
+swapNode(_row,_row.nextSibling);
+}
+}
+//定義通用的函式交換兩個結點的位置
+function swapNode(node1,node2){
+//獲取父結點
+var _parent=node1.parentNode;
+//獲取兩個結點的相對位置
+var _t1=node1.nextSibling;
+var _t2=node2.nextSibling;
+//將node2插入到原來node1的位置
+if(_t1)_parent.insertBefore(node2,_t1);
+else _parent.appendChild(node2);
+//將node1插入到原來node2的位置
+if(_t2)_parent.insertBefore(node1,_t2);
+else _parent.appendChild(node1);
+}
+/**
+* function move to top
+* _a thisRow a
+*/
+function moveToTop(_a){ 
+var _row=_a.parentNode.parentNode;
+var _parent= _row.parentNode;
+if (_row.rowIndex != 1)
+_parent.moveRow(_row.rowIndex-1, 0);
+}
+/**
+* function move to bottom
+* _a thisRow a
+*/
+function moveToBottom(_a){
+var _row=_a.parentNode.parentNode;// 該行資訊 
+var _parent= _row.parentNode;// 父節點
+_parent.appendChild(_row);
+}
+//-->
+</script>
+
+
+</head>
+<body>
+<div id="toolbar"></div>
+
+<div id="p-main" style="border:0;margin:5px;" >
+<form method="post"> 
+<table id="resultTable" class="tablesorter" border="1">
+<thead>
+<tr>
+<th>段落標題</th>
+<th>排序</th>
+</tr>
+</thead>
+<tbody>
+
+<tr id="0">
+<td width="600px">
+<input type="hidden" name="blockInfoList[0].id" value="402881d92cbf6b2a012cbf7426380003" id="block_order_edit_blockInfoList_0__id"/>
+<input type="hidden" name="blockInfoList[0].name" value="江陰中達" id="block_order_edit_blockInfoList_0__name"/>
+<input type="hidden" name="blockInfoList[0].questionnaireId" value="402881d92cbf6b2a012cbf7424730001" id="block_order_edit_blockInfoList_0__questionnaireId"/>
+<input type="hidden" name="blockInfoList[0].proportion" value="0.0" id="block_order_edit_blockInfoList_0__proportion"/>
+<input type="hidden" name="blockInfoList[0].useSupplyer" value="1" id="block_order_edit_blockInfoList_0__useSupplyer"/> 
+江陰中達
+</td>
+<td align="center"> 
+<input type="hidden" name="blockInfoList[0].orderId" value="1" id="pn_0" class="easyui-numberbox"/>
+<input type="button" id="addAll" value="置頂" onclick='moveToTop(this)'/>
+<input type="button" id="addAll" value="上移" onclick='moveUp(this,0)'/>
+<input type="button" id="addAll" value="下移" onclick="moveDown(this,0)"/> 
+<input type="button" id="addAll" value="置底" onclick='moveToBottom(this)'/> 
+</td>
+</tr>
+
+<tr id="1">
+<td width="600px">
+<input type="hidden" name="blockInfoList[1].id" value="402881d92cbf6b2a012cbf7426a60004" id="block_order_edit_blockInfoList_1__id"/>
+<input type="hidden" name="blockInfoList[1].name" value="雲南昆嶺" id="block_order_edit_blockInfoList_1__name"/>
+<input type="hidden" name="blockInfoList[1].questionnaireId" value="402881d92cbf6b2a012cbf7424730001" id="block_order_edit_blockInfoList_1__questionnaireId"/>
+<input type="hidden" name="blockInfoList[1].proportion" value="0.0" id="block_order_edit_blockInfoList_1__proportion"/>
+<input type="hidden" name="blockInfoList[1].useSupplyer" value="1" id="block_order_edit_blockInfoList_1__useSupplyer"/> 
+雲南昆嶺
+</td>
+<td align="center"> 
+<input type="hidden" name="blockInfoList[1].orderId" value="2" id="pn_1" class="easyui-numberbox"/>
+<input type="button" id="addAll" value="置頂" onclick='moveToTop(this)'/>
+<input type="button" id="addAll" value="上移" onclick='moveUp(this,1)'/>
+<input type="button" id="addAll" value="下移" onclick="moveDown(this,1)"/> 
+<input type="button" id="addAll" value="置底" onclick='moveToBottom(this)'/> 
+</td>
+</tr>
+
+<tr id="2">
+<td width="600px">
+<input type="hidden" name="blockInfoList[2].id" value="402881d92cbf6b2a012cbf7426e40005" id="block_order_edit_blockInfoList_2__id"/>
+<input type="hidden" name="blockInfoList[2].name" value="湛江公司" id="block_order_edit_blockInfoList_2__name"/>
+<input type="hidden" name="blockInfoList[2].questionnaireId" value="402881d92cbf6b2a012cbf7424730001" id="block_order_edit_blockInfoList_2__questionnaireId"/>
+<input type="hidden" name="blockInfoList[2].proportion" value="0.0" id="block_order_edit_blockInfoList_2__proportion"/>
+<input type="hidden" name="blockInfoList[2].useSupplyer" value="1" id="block_order_edit_blockInfoList_2__useSupplyer"/> 
+湛江公司
+</td>
+<td align="center"> 
+<input type="hidden" name="blockInfoList[2].orderId" value="3" id="pn_2" class="easyui-numberbox"/>
+<input type="button" id="addAll" value="置頂" onclick='moveToTop(this)'/>
+<input type="button" id="addAll" value="上移" onclick='moveUp(this,2)'/>
+<input type="button" id="addAll" value="下移" onclick="moveDown(this,2)"/> 
+<input type="button" id="addAll" value="置底" onclick='moveToBottom(this)'/> 
+</td>
+</tr>
+
+<tr id="3">
+<td width="600px">
+<input type="hidden" name="blockInfoList[3].id" value="402881d92cbf6b2a012cbf7427130006" id="block_order_edit_blockInfoList_3__id"/>
+<input type="hidden" name="blockInfoList[3].name" value="英諾公司" id="block_order_edit_blockInfoList_3__name"/>
+<input type="hidden" name="blockInfoList[3].questionnaireId" value="402881d92cbf6b2a012cbf7424730001" id="block_order_edit_blockInfoList_3__questionnaireId"/>
+<input type="hidden" name="blockInfoList[3].proportion" value="0.0" id="block_order_edit_blockInfoList_3__proportion"/>
+<input type="hidden" name="blockInfoList[3].useSupplyer" value="1" id="block_order_edit_blockInfoList_3__useSupplyer"/> 
+英諾公司
+</td>
+<td align="center"> 
+<input type="hidden" name="blockInfoList[3].orderId" value="4" id="pn_3" class="easyui-numberbox"/>
+<input type="button" id="addAll" value="置頂" onclick='moveToTop(this)'/>
+<input type="button" id="addAll" value="上移" onclick='moveUp(this,3)'/>
+<input type="button" id="addAll" value="下移" onclick="moveDown(this,3)"/> 
+<input type="button" id="addAll" value="置底" onclick='moveToBottom(this)'/> 
+</td>
+</tr>
+
+<tr id="4">
+<td width="600px">
+<input type="hidden" name="blockInfoList[4].id" value="402881d92cbf6b2a012cbf7427420007" id="block_order_edit_blockInfoList_4__id"/>
+<input type="hidden" name="blockInfoList[4].name" value="請您對材料質量情況作出評價" id="block_order_edit_blockInfoList_4__name"/>
+<input type="hidden" name="blockInfoList[4].questionnaireId" value="402881d92cbf6b2a012cbf7424730001" id="block_order_edit_blockInfoList_4__questionnaireId"/>
+<input type="hidden" name="blockInfoList[4].proportion" value="0.0" id="block_order_edit_blockInfoList_4__proportion"/>
+<input type="hidden" name="blockInfoList[4].useSupplyer" value="0" id="block_order_edit_blockInfoList_4__useSupplyer"/> 
+請您對材料質量情況作出評價
+</td>
+<td align="center"> 
+<input type="hidden" name="blockInfoList[4].orderId" value="5" id="pn_4" class="easyui-numberbox"/>
+<input type="button" id="addAll" value="置頂" onclick='moveToTop(this)'/>
+<input type="button" id="addAll" value="上移" onclick='moveUp(this,4)'/>
+<input type="button" id="addAll" value="下移" onclick="moveDown(this,4)"/> 
+<input type="button" id="addAll" value="置底" onclick='moveToBottom(this)'/> 
+</td>
+</tr>
+
+<tr id="5">
+<td width="600px">
+<input type="hidden" name="blockInfoList[5].id" value="402881d92cbf6b2a012cbf7424b20002" id="block_order_edit_blockInfoList_5__id"/>
+<input type="hidden" name="blockInfoList[5].name" value="填表單位資訊" id="block_order_edit_blockInfoList_5__name"/>
+<input type="hidden" name="blockInfoList[5].questionnaireId" value="402881d92cbf6b2a012cbf7424730001" id="block_order_edit_blockInfoList_5__questionnaireId"/>
+<input type="hidden" name="blockInfoList[5].proportion" value="0.0" id="block_order_edit_blockInfoList_5__proportion"/>
+<input type="hidden" name="blockInfoList[5].useSupplyer" value="0" id="block_order_edit_blockInfoList_5__useSupplyer"/> 
+填表單位資訊
+</td>
+<td align="center"> 
+<input type="hidden" name="blockInfoList[5].orderId" value="6" id="pn_5" class="easyui-numberbox"/>
+<input type="button" id="addAll" value="置頂" onclick='moveToTop(this)'/>
+<input type="button" id="addAll" value="上移" onclick='moveUp(this,5)'/>
+<input type="button" id="addAll" value="下移" onclick="moveDown(this,5)"/> 
+<input type="button" id="addAll" value="置底" onclick='moveToBottom(this)'/> 
+</td>
+</tr> 
+</tbody>
+</table> 
+</form>
+</div>
+</body>
+</html>
