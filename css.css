@@ -23,7 +23,7 @@ body {
   }
   #listing {
     position: absolute;
-    width: 200px;
+    width: 300px;
     height: 70%;
     left: 80%;
     top: 0px;
@@ -33,7 +33,7 @@ body {
   
   #resultsTable {
     border-collapse: collapse;
-    width: 240px;
+    width: 300px;
   }
   #Travel,#Food {
     position: absolute;
@@ -51,5 +51,8 @@ body {
     left: 25%;
   }
   #Food{
-    left: 75%;
+    left: 55%;
+  }
+  .none{
+    display: none
   }

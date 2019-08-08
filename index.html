@@ -99,9 +99,10 @@
   </script>
   <script>
 
-    var map, taipei, service, infowindow, origin, destination, directionsService, directionsDisplay, geocoder, DistanceMatrix,distanceResponse
+    var map, taipei, service, infowindow, origin, destination, directionsService, directionsDisplay, geocoder, DistanceMatrix, distanceResponse
     var markers = []
     var point = []
+    var dist = []
     var hostnameRegexp = new RegExp('^https?://.+?/');
     var MARKER_PATH = 'https://developers.google.com/maps/documentation/javascript/images/marker_green';
     var selectedMode = document.getElementById('mode').value;
@@ -155,7 +156,7 @@
     function distance() {
       DistanceMatrix.getDistanceMatrix({
         origins: [origin],
-        destinations: [destination,{ lat: 25.0421407,lng: 121.5198716},{ lat: 25.0423,lng: 121.52134}],
+        destinations: dist,
         travelMode: selectedMode,
         unitSystem: google.maps.UnitSystem.METRIC,
         avoidHighways: false,
@@ -164,11 +165,11 @@
         if (status !== 'OK') {
           alert('Error was: ' + status);
         } else {
-          distanceResponse=response.rows[0]
-          outputdistance.innerHTML = ""
-          outputdistance.innerHTML += response.rows[0].elements[0].distance.text
+          distanceResponse = response.rows[0].elements
+          // outputdistance.innerHTML = ""
+          // outputdistance.innerHTML += response.rows[0].elements[0].distance.text
           console.log(response)
-          document.getElementById('iw-distance').textContent = outputdistance.innerHTML;
+          // document.getElementById('iw-distance').textContent = outputdistance.innerHTML;
         }
       });
     }
@@ -186,6 +187,15 @@
         }
       });
     }
+    function list() {
+      var tr = Array.from(document.querySelectorAll("#resultsTable tr"))
+      for (var i = 0; i < tr.length; i++) {
+        tr[i].children[1].innerHTML += `<span >${distanceResponse[i].distance.value}</span>`
+      }
+      console.log(tr)
+      tr.sort((a, b) => a.children[1].children[0].innerText > b.children[1].children[0].innerText ? 1 : -1)
+      console.log(tr)
+    }
     // -------------------------------------------
     function search(results, status) {
       if (status == google.maps.places.PlacesServiceStatus.OK) {
@@ -194,12 +204,14 @@
           var markerIcon = MARKER_PATH + markerLetter + '.png';
           addMarker({ coords: results[i].geometry.location }, markerIcon);
           markers[i].placeResult = results[i];
-          google.maps.event.addListener(markers[i], 'click', function () { destination = this.position; distance() });
+          dist.push(results[i].geometry.location)
+          google.maps.event.addListener(markers[i], 'click', function () { destination = this.position; });
           google.maps.event.addListener(markers[i], 'click', showInfoWindow);
           setTimeout(dropMarker(i), i * 100);
           addResult(results[i], i);
-
         }
+        distance()
+
       }
     }
     function addMarker(place, markerIcon) {
@@ -215,6 +227,9 @@
       markers = []
       point.forEach(e => e.setMap(null))
       point = []
+      dist.forEach(e => e.setMap(null))
+      dist = []
+
     }
 
     function dropMarker(i) {
@@ -270,15 +285,14 @@
     }
 
     function buildIWContent(place) {
-      document.getElementById('iw-icon').innerHTML = '<img' +
-        'src="' + place.icon + '"/>';
-        if(place.website){
-      document.getElementById('iw-url').innerHTML = '<b><a href="' + place.website +
-        '">' + place.name + '</a></b>';
-        }else{
-      document.getElementById('iw-url').innerHTML = '<b><a href="' + place.url +
-        '">' + place.name + '</a></b>'
-        }
+      document.getElementById('iw-icon').innerHTML = '<img' + ' src="' + place.icon + '"/>';
+      if (place.website) {
+        document.getElementById('iw-url').innerHTML = '<b><a href="' + place.website +
+          '">' + place.name + '</a></b>';
+      } else {
+        document.getElementById('iw-url').innerHTML = '<b><a href="' + place.url +
+          '">' + place.name + '</a></b>'
+      }
       document.getElementById('iw-address').textContent = place.vicinity;
       if (place.opening_hours) {
         if (place.opening_hours.open_now) {
@@ -322,7 +336,7 @@
           fullUrl = website;
         }
         document.getElementById('iw-website-row').style.display = '';
-        document.getElementById('iw-website').innerHTML =  `<a href="${website}">${website}<a>`;;
+        document.getElementById('iw-website').innerHTML = `<a href="${website}">${website}<a>`;;
       } else {
         document.getElementById('iw-website-row').style.display = 'none';
       }
