@@ -1,58 +1,99 @@
+@import url('https://fonts.googleapis.com/css?family=Noto+Sans+TC:400,700&display=swap');
 #map {
-  width: 60%;
-  height: 70%;
+  width: 100%;
+  height: 100%;
   margin: 0% auto
 }
-html,
-body {
+
+html, body {
+  width: 100%;
   height: 100%;
   margin: 0;
   padding: 0;
+  font-family: 'Noto Sans TC', sans-serif;
 }
+
 .iw_table_row {
-    height: 18px;
-  }
+  height: 18px;
+}
 
-  .iw_attribute_name {
-    font-weight: bold;
-    text-align: right;
-  }
+.iw_attribute_name {
+  font-weight: bold;
+  text-align: right;
+}
 
-  .iw_table_icon {
-    text-align: right;
-  }
-  #listing {
-    position: absolute;
-    width: 300px;
-    height: 70%;
-    left: 80%;
-    top: 0px;
-    cursor: pointer;
-    overflow-x: hidden;
-  }
-  
-  #resultsTable {
-    border-collapse: collapse;
-    width: 300px;
-  }
-  #Travel,#Food {
-    position: absolute;
-    top: 10px;
-    z-index: 5;
-    background-color: #fff;
-    padding: 5px;
-    border: 1px solid #999;
-    text-align: center;
-    font-family: 'Roboto','sans-serif';
-    line-height: 30px;
-    padding-left: 10px;
-  }
-  #Travel{
-    left: 25%;
-  }
-  #Food{
-    left: 55%;
-  }
-  .none{
-    display: none
-  }
+.iw_table_icon {
+  text-align: right;
+}
+
+#listing {
+  position: absolute;
+  width: 6%;
+  height: 60%;
+  right: 3%;
+  top: 15vh;
+  cursor: pointer;
+  overflow-x: hidden;
+  transition: all 0.5s ease-in-out;
+  transition-delay: 3s
+}
+
+#listing:hover {
+  width: 315px;
+  border-left: none;
+  transition: all 0.5s ease-in-out;
+}
+
+ul {
+  margin: 0%;
+  padding: 0%
+}
+
+li {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  color: #FFF;
+  font-weight: 700;
+}
+
+.placeIcon {
+  width: 20px;
+  height: 34px;
+  margin: 15px;
+}
+
+#results {
+  border-collapse: collapse;
+  width: 300px;
+}
+
+#Travel, #Food {
+  position: absolute;
+  top: 10px;
+  z-index: 5;
+  background-color: #fff;
+  padding: 5px;
+  border: 1px solid #999;
+  text-align: center;
+  line-height: 30px;
+  padding-left: 10px;
+}
+
+#distance {
+  margin: 0;
+  position: absolute;
+}
+
+#Travel {
+  left: 25%;
+}
+
+#Food {
+  left: 55%;
+}
+
+.none {
+  display: none
+}

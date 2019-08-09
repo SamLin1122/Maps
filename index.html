@@ -9,11 +9,7 @@
 </head>
 
 <body>
-  <input type="text" id="distance" value="500">公尺
-  <div>
-    <strong>Results</strong>
-  </div>
-  <div id="output"></div>
+  <!-- <input type="text" id="distance" value="500">公尺 -->
   <div id="Travel">
     <b>Mode of Travel: </b>
     <select id="mode">
@@ -21,8 +17,6 @@
       <option value="WALKING">Walking</option>
       <option value="TRANSIT">Transit</option>
     </select>
-  </div>
-  <div id="Food">
     <b>Mode of Food: </b>
     <select id="foodmode">
       <option value="restaurant">Restaurant</option>
@@ -32,11 +26,11 @@
     </select>
   </div>
 
+
   <div id="map"></div>
   <div id="listing">
-    <table id="resultsTable">
-      <tbody id="results"></tbody>
-    </table>
+    <ul id="results">
+    </ul>
   </div>
   <div style="display: none">
     <div id="info-content">
@@ -99,14 +93,12 @@
   </script>
   <script>
 
-    var map, taipei, service, infowindow, origin, destination, directionsService, directionsDisplay, geocoder, DistanceMatrix, distanceResponse
+    var lp, map, taipei, service, infowindow, origin, destination, directionsService, directionsDisplay, geocoder, DistanceMatrix, distanceResponse
     var markers = []
     var point = []
     var dist = []
     var hostnameRegexp = new RegExp('^https?://.+?/');
     var MARKER_PATH = 'https://developers.google.com/maps/documentation/javascript/images/marker_green';
-    var selectedMode = document.getElementById('mode').value;
-    var outputdistance = document.getElementById('output');
 
     function initMap() {
       taipei = new google.maps.LatLng(25.0329694, 121.5654177);
@@ -122,6 +114,12 @@
       document.getElementById('mode').addEventListener('change', function () {
         calculateAndDisplayRoute(directionsService, directionsDisplay);
       });
+      document.getElementById('foodmode').addEventListener('change', function () {
+        clearMarkers()
+        clearResults()
+        directionsDisplay.setMap(null);
+        map.setZoom(15)
+      })
 
       // ----------------------------------------
       infoWindow = new google.maps.InfoWindow({
@@ -131,7 +129,8 @@
       google.maps.event.addListener(map, "click", function (event) {
         clearMarkers()
         clearResults()
-        map.setZoom(16)
+        var foodmode = document.getElementById('foodmode').value
+        // map.setZoom(14)
         origin = event.latLng
         point.push(new google.maps.Marker({
           map: map,
@@ -143,20 +142,20 @@
           location: origin,
           bounds: map.getBounds(),
           // radius: document.querySelector("#distance").value,
-          type: [document.getElementById('foodmode').value]
+          type: [foodmode]
         };
         service.nearbySearch(request, search);
-
+        directionsDisplay.setMap(null);
       })
       // -------------------------------------------------------------------------------
       geocoder = new google.maps.Geocoder;
       DistanceMatrix = new google.maps.DistanceMatrixService;
-      // destination?distance():""
     }
-    function distance() {
+    function distance(e) {
+      var selectedMode = document.getElementById('mode').value;
       DistanceMatrix.getDistanceMatrix({
         origins: [origin],
-        destinations: dist,
+        destinations: e,
         travelMode: selectedMode,
         unitSystem: google.maps.UnitSystem.METRIC,
         avoidHighways: false,
@@ -165,16 +164,16 @@
         if (status !== 'OK') {
           alert('Error was: ' + status);
         } else {
-          distanceResponse = response.rows[0].elements
-          // outputdistance.innerHTML = ""
-          // outputdistance.innerHTML += response.rows[0].elements[0].distance.text
-          console.log(response)
-          // document.getElementById('iw-distance').textContent = outputdistance.innerHTML;
+          distanceResponse = response.rows[0].elements;
+          document.getElementById('iw-distance').textContent = distanceResponse[0].distance.text
         }
       });
+      // return distanceResponse
     }
+
     // -------------------------------------------
     function calculateAndDisplayRoute(directionsService, directionsDisplay) {
+      var selectedMode = document.getElementById('mode').value;
       directionsService.route({
         origin: origin,
         destination: destination,
@@ -187,15 +186,16 @@
         }
       });
     }
+
     function list() {
       var tr = Array.from(document.querySelectorAll("#resultsTable tr"))
+      distance(dist)
       for (var i = 0; i < tr.length; i++) {
         tr[i].children[1].innerHTML += `<span >${distanceResponse[i].distance.value}</span>`
       }
-      console.log(tr)
       tr.sort((a, b) => a.children[1].children[0].innerText > b.children[1].children[0].innerText ? 1 : -1)
-      console.log(tr)
     }
+
     // -------------------------------------------
     function search(results, status) {
       if (status == google.maps.places.PlacesServiceStatus.OK) {
@@ -205,18 +205,16 @@
           addMarker({ coords: results[i].geometry.location }, markerIcon);
           markers[i].placeResult = results[i];
           dist.push(results[i].geometry.location)
-          google.maps.event.addListener(markers[i], 'click', function () { destination = this.position; });
+          // distance([results[i].geometry.location])
+          google.maps.event.addListener(markers[i], 'click', function () { destination = this.position; distance([destination]); });
           google.maps.event.addListener(markers[i], 'click', showInfoWindow);
           setTimeout(dropMarker(i), i * 100);
           addResult(results[i], i);
         }
-        distance()
-
       }
     }
     function addMarker(place, markerIcon) {
       markers.push(new google.maps.Marker({
-        map: map,
         position: place.coords,
         animation: google.maps.Animation.DROP,
         icon: markerIcon
@@ -227,7 +225,6 @@
       markers = []
       point.forEach(e => e.setMap(null))
       point = []
-      dist.forEach(e => e.setMap(null))
       dist = []
 
     }
@@ -243,24 +240,25 @@
       var markerLetter = String.fromCharCode('A'.charCodeAt(0) + (i % 26));
       var markerIcon = MARKER_PATH + markerLetter + '.png';
 
-      var tr = document.createElement('tr');
-      tr.style.backgroundColor = (i % 2 === 0 ? '#F0F0F0' : '#FFFFFF');
-      tr.onclick = function () {
+      var li = document.createElement('li');
+
+      li.style.backgroundColor = (i % 2 === 0 ? 'rgba(255, 40, 40, 0.4)' : 'rgba(255, 20, 20, 0.5)');
+      li.onclick = function () {
         google.maps.event.trigger(markers[i], 'click');
       };
 
-      var iconTd = document.createElement('td');
-      var nameTd = document.createElement('td');
+
+      // var value= distance(d)[0].distance.value  
+      // var span = document.createElement('span.none');
+      // span.textContent=value
       var icon = document.createElement('img');
       icon.src = markerIcon;
       icon.setAttribute('class', 'placeIcon');
-      icon.setAttribute('className', 'placeIcon');
       var name = document.createTextNode(result.name);
-      iconTd.appendChild(icon);
-      nameTd.appendChild(name);
-      tr.appendChild(iconTd);
-      tr.appendChild(nameTd);
-      results.appendChild(tr);
+      li.appendChild(icon);
+      li.appendChild(name);
+      // li.appendChild(span);
+      results.appendChild(li);
     }
     function clearResults() {
       var results = document.getElementById('results');
@@ -271,7 +269,7 @@
 
     // ------------------------------------------------------
     function showInfoWindow() {
-
+      directionsDisplay.setMap(map);
       calculateAndDisplayRoute(directionsService, directionsDisplay);
       var marker = this;
       service.getDetails({ placeId: marker.placeResult.place_id },
@@ -285,6 +283,7 @@
     }
 
     function buildIWContent(place) {
+      // console.log(distanceResponse, place.address_components)
       document.getElementById('iw-icon').innerHTML = '<img' + ' src="' + place.icon + '"/>';
       if (place.website) {
         document.getElementById('iw-url').innerHTML = '<b><a href="' + place.website +
@@ -303,7 +302,6 @@
       } else {
         document.getElementById('iw-opening').style.display = "none";
       }
-
 
       if (place.formatted_phone_number) {
         document.getElementById('iw-phone-row').style.display = '';
@@ -341,14 +339,6 @@
         document.getElementById('iw-website-row').style.display = 'none';
       }
     }
-
-
-
-
-
-
-
-
 
   </script>
   <script
