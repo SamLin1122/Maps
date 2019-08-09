@@ -10,7 +10,7 @@
 
 <body>
   <!-- <input type="text" id="distance" value="500">公尺 -->
-  <div id="Travel">
+  <div id="selection">
     <b>Mode of Travel: </b>
     <select id="mode">
       <option value="DRIVING">Driving</option>
@@ -24,6 +24,8 @@
       <option value="bar">Bar</option>
       <option value="bakery">Bakery</option>
     </select>
+    <b>Searching Distance: </b>
+    <input id="distance" type="text" value="500">公尺
   </div>
 
 
@@ -66,31 +68,7 @@
       </table>
     </div>
   </div>
-  <script>
-    function moveUp(a, orderId) {
-      var row = a.parentNode.parentNode;
-      var tdSeq = row.rowIndex - 1;
-      if (row.previousSibling) {
-        swapNode(row, row.previousSibling);
-      }
-    }
-    function moveDown(a, orderId) {
-      var row = a.parentNode.parentNode;
-      var tdSeq = row.rowIndex + 1;
-      if (row.nextSibling) {
-        swapNode(row, row.nextSibling);
-      }
-    }
-    function swapNode(node1, node2) {
-      var parent = node1.parentNode;
-      var t1 = node1.nextSibling;
-      var t2 = node2.nextSibling;
-      if (t1) parent.insertBefore(node2, t1);
-      else parent.appendChild(node2);
-      if (t2) parent.insertBefore(node1, t2);
-      else parent.appendChild(node1);
-    }
-  </script>
+
   <script>
 
     var lp, map, taipei, service, infowindow, origin, destination, directionsService, directionsDisplay, geocoder, DistanceMatrix, distanceResponse
@@ -101,16 +79,24 @@
     var MARKER_PATH = 'https://developers.google.com/maps/documentation/javascript/images/marker_green';
 
     function initMap() {
-      taipei = new google.maps.LatLng(25.0329694, 121.5654177);
+      taipei = new google.maps.LatLng(25.0499358, 121.537079);
       directionsService = new google.maps.DirectionsService;
       map = new google.maps.Map(document.getElementById('map'), {
         center: taipei,
-        zoom: 15
+        zoom: 15,
+        mapTypeControl: false,
+        fullscreenControl: false,
       });
       // ------------------------------------
 
       directionsDisplay = new google.maps.DirectionsRenderer;
       directionsDisplay.setMap(map);
+      document.getElementById('distance').addEventListener('change', function () {
+        clearMarkers()
+        clearResults()
+        directionsDisplay.setMap(null);
+        map.setZoom(15)
+      })
       document.getElementById('mode').addEventListener('change', function () {
         calculateAndDisplayRoute(directionsService, directionsDisplay);
       });
@@ -129,6 +115,7 @@
       google.maps.event.addListener(map, "click", function (event) {
         clearMarkers()
         clearResults()
+        document.querySelector("#distance").value <= 500 ? map.setZoom(17) : document.querySelector("#distance").value < 1100 ? map.setZoom(16) : map.setZoom(15)
         var foodmode = document.getElementById('foodmode').value
         // map.setZoom(14)
         origin = event.latLng
@@ -140,8 +127,8 @@
         map.setCenter(origin);
         var request = {
           location: origin,
-          bounds: map.getBounds(),
-          // radius: document.querySelector("#distance").value,
+          // bounds: map.getBounds(),
+          radius: document.querySelector("#distance").value,
           type: [foodmode]
         };
         service.nearbySearch(request, search);
@@ -187,14 +174,14 @@
       });
     }
 
-    function list() {
-      var tr = Array.from(document.querySelectorAll("#resultsTable tr"))
-      distance(dist)
-      for (var i = 0; i < tr.length; i++) {
-        tr[i].children[1].innerHTML += `<span >${distanceResponse[i].distance.value}</span>`
-      }
-      tr.sort((a, b) => a.children[1].children[0].innerText > b.children[1].children[0].innerText ? 1 : -1)
-    }
+    // function list() {
+    //   var tr = Array.from(document.querySelectorAll("#resultsTable tr"))
+    //   distance(dist)
+    //   for (var i = 0; i < tr.length; i++) {
+    //     tr[i].children[1].innerHTML += `<span >${distanceResponse[i].distance.value}</span>`
+    //   }
+    //   tr.sort((a, b) => a.children[1].children[0].innerText > b.children[1].children[0].innerText ? 1 : -1)
+    // }
 
     // -------------------------------------------
     function search(results, status) {

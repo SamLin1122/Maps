@@ -28,14 +28,14 @@ html, body {
 
 #listing {
   position: absolute;
-  width: 6%;
+  width: 67px;
   height: 60%;
   right: 3%;
   top: 15vh;
   cursor: pointer;
   overflow-x: hidden;
   transition: all 0.5s ease-in-out;
-  transition-delay: 3s
+  transition-delay: 2s
 }
 
 #listing:hover {
@@ -69,29 +69,25 @@ li {
   width: 300px;
 }
 
-#Travel, #Food {
+#selection {
   position: absolute;
+  left: 1%;
   top: 10px;
   z-index: 5;
   background-color: #fff;
   padding: 5px;
-  border: 1px solid #999;
   text-align: center;
   line-height: 30px;
   padding-left: 10px;
+  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.267);
+  border-radius: 8px;
 }
 
 #distance {
   margin: 0;
-  position: absolute;
-}
-
-#Travel {
-  left: 25%;
-}
-
-#Food {
-  left: 55%;
+  width: 40px;
+  text-align: right
+  /* position: absolute; */
 }
 
 .none {
