@@ -159,7 +159,6 @@ function addResult(result, i) {
   li.appendChild(icon);
   li.appendChild(name);
   results.appendChild(li);
-  li.innerHTML += `<br>評價：${result.rating}(${result.user_ratings_total})`
 }
 function clearResults() {
   var results = document.getElementById('results');
